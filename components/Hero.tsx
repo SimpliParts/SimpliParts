@@ -4,7 +4,12 @@ import { ArrowRight, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ProcessAnimation } from './ProcessAnimation';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onGetStarted: () => void;
+  onSeeHowItWorks: () => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onGetStarted, onSeeHowItWorks }) => {
   return (
     <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
@@ -43,11 +48,11 @@ export const Hero: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row gap-4 mb-20"
         >
-          <Button size="lg" className="group">
+          <Button size="lg" className="group" onClick={onGetStarted}>
             Start Free Audit
             <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <Button variant="outline" size="lg" className="group">
+          <Button variant="outline" size="lg" className="group" onClick={onSeeHowItWorks}>
             <PlayCircle size={18} className="mr-2 text-slate-400 group-hover:text-blue-600 transition-colors" />
             See How it Works
           </Button>

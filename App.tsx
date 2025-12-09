@@ -80,6 +80,22 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const navigateToSignup = () => {
+    setCurrentView('signup');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const headerOffset = 80;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -104,11 +120,14 @@ const App: React.FC = () => {
         <main className="flex-grow">
           {currentView === 'landing' && (
             <>
-              <Hero />
+              <Hero 
+                onGetStarted={navigateToSignup}
+                onSeeHowItWorks={() => scrollToSection('workflow')}
+              />
               <Trust />
               <Workflow />
               <RoiCalculator />
-              <Pricing />
+              <Pricing onStart={navigateToSignup} />
             </>
           )}
           

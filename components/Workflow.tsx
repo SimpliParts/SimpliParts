@@ -12,15 +12,15 @@ const steps = [
   },
   {
     id: 2,
-    title: 'One-Click Ordering',
-    description: 'Review the best options. You decide what to add to Tekmetric. Simply click "Order" and we handle the procurement instantly.',
+    title: 'One-Click Best Price',
+    description: 'When a technician finishes quoting a repair, enter the RO number. We pull the parts list, shop it with AI + PartsTech for the best pricing in seconds, and let you replace or add items in Tekmetric to recapture lost profit.',
     icon: MousePointerClick,
     color: 'bg-purple-100 text-purple-600',
   },
   {
     id: 3,
     title: 'Automated Receiving',
-    description: 'When parts arrive, simply scan the vendor invoice. We automatically check the parts in and notify your technician that their job is ready.',
+    description: 'Upload a vendor invoice when parts arrive. We automatically intake those parts into Tekmetric, reconcile them, and notify your technician that their job is ready.',
     icon: ScanBarcode,
     color: 'bg-emerald-100 text-emerald-600',
   },

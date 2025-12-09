@@ -3,7 +3,11 @@ import { Button } from './ui/Button';
 import { Check, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const Pricing: React.FC = () => {
+interface PricingProps {
+  onStart: () => void;
+}
+
+export const Pricing: React.FC<PricingProps> = ({ onStart }) => {
   return (
     <section id="pricing" className="py-24 bg-white relative overflow-hidden scroll-mt-28">
       {/* Background Decor */}
@@ -105,7 +109,7 @@ export const Pricing: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <Button size="lg" className="w-full text-lg h-14 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20">
+                    <Button size="lg" className="w-full text-lg h-14 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20" onClick={onStart}>
                         Start Recovering Lost Profit
                     </Button>
                     <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
