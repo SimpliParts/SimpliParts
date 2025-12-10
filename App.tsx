@@ -19,6 +19,7 @@ import { RODetail } from './components/RODetail';
 import { AskAI } from './components/AskAI';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import { MaintenanceGate } from './components/MaintenanceGate';
 
 export type ViewState =
   | 'landing'
@@ -38,8 +39,18 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('landing');
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [maintenanceUnlocked, setMaintenanceUnlocked] = useState(false);
+
+  const maintenanceEnabled = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
+  const previewPassword = import.meta.env.VITE_PREVIEW_PASSWORD || '';
 
   useEffect(() => {
+    // Check persisted maintenance bypass
+    const storedBypass = localStorage.getItem('simpli:maintenance:unlock');
+    if (storedBypass === 'true') {
+      setMaintenanceUnlocked(true);
+    }
+
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -96,12 +107,21 @@ const App: React.FC = () => {
     window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
   };
 
+  const handleUnlock = () => {
+    setMaintenanceUnlocked(true);
+    localStorage.setItem('simpli:maintenance:unlock', 'true');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
+  }
+
+  if (maintenanceEnabled && !maintenanceUnlocked) {
+    return <MaintenanceGate onUnlock={handleUnlock} previewPassword={previewPassword} />;
   }
 
   return (
