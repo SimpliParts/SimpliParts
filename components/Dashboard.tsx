@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { ViewState } from '../App';
 import { Bell, ArrowUpRight, Check, UploadCloud, Compass, LineChart, BarChart3 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Button } from './ui/Button';
+import { fetchShopInfo, openBillingPortal, ShopInfo, startCheckout } from '../lib/billing';
 
 interface DashboardProps {
   session: Session | null;
@@ -15,14 +16,54 @@ export const Dashboard: React.FC<DashboardProps> = ({ session, setCurrentView, c
   // Get user details (fallback if metadata is missing)
   const firstName = session?.user?.user_metadata?.first_name || 'Partner';
   const shopName = session?.user?.user_metadata?.shop_name || 'My Shop';
+  const [shop, setShop] = useState<ShopInfo | null>(null);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchShopInfo(session.user.id).then(setShop).catch((err) => {
+        console.error('Failed to load shop info', err);
+      });
+    }
+  }, [session?.user?.id]);
+
+  const handleUpgrade = async () => {
+    try {
+      setBillingLoading(true);
+      setBillingError(null);
+      const { url } = await startCheckout();
+      if (url) window.location.href = url;
+    } catch (err: any) {
+      setBillingError(err.message || 'Could not start checkout');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    try {
+      setBillingLoading(true);
+      setBillingError(null);
+      const { url } = await openBillingPortal();
+      if (url) window.location.href = url;
+    } catch (err: any) {
+      setBillingError(err.message || 'Could not open billing portal');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
+  const isActive = shop?.subscription_status === 'active';
+  const credits = shop?.free_credits_remaining ?? 0;
 
   return (
     <div className="flex min-h-[calc(100vh-72px)] pt-[72px]">
       <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
-        headingName={shopName}
-        headingSub="Enterprise Plan"
+        headingName={shop?.name || shopName}
+        headingSub={isActive ? 'Active' : 'Free Tier'}
       />
 
       {/* Main Content */}
@@ -45,6 +86,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ session, setCurrentView, c
         </header>
 
         <div className="p-8 max-w-6xl mx-auto">
+             {/* Billing status */}
+             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+               <div>
+                 <div className="text-xs font-semibold text-slate-500 uppercase tracking-[0.15em]">Account</div>
+                 <h3 className="text-lg font-semibold text-slate-900">
+                   {isActive ? 'Subscription active' : 'Free tier'}
+                 </h3>
+                 <p className="text-sm text-slate-600">
+                   {isActive
+                     ? 'Unlimited audits and queries are enabled.'
+                     : `You have ${credits} free queries remaining.`}
+                 </p>
+                 {billingError && (
+                   <p className="text-sm text-red-600 mt-2">{billingError}</p>
+                 )}
+               </div>
+               <div className="flex flex-wrap gap-3">
+                 {isActive ? (
+                   <Button variant="outline" onClick={handleManageBilling} disabled={billingLoading}>
+                     Manage billing
+                   </Button>
+                 ) : (
+                   <Button onClick={handleUpgrade} disabled={billingLoading}>
+                     {billingLoading ? 'Redirecting...' : 'Upgrade'}
+                   </Button>
+                 )}
+               </div>
+             </div>
+             
              {/* Quick Actions */}
              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>

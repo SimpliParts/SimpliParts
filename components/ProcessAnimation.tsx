@@ -4,6 +4,14 @@ import { ScanLine, Search, CheckCircle2, ArrowRight, TrendingUp } from 'lucide-r
 
 export const ProcessAnimation: React.FC = () => {
   const [step, setStep] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -12,8 +20,11 @@ export const ProcessAnimation: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const activeScale = isMobile ? 1.1 : 1.5;
+  const labelLift = isMobile ? 14 : 35;
+
   return (
-    <div className="relative mx-auto w-full h-[280px] md:h-[340px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col items-center justify-center p-6">
+    <div className="relative mx-auto w-full h-auto min-h-[520px] md:min-h-0 md:h-[340px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-visible md:overflow-hidden flex flex-col items-center justify-center p-5 md:p-6">
         
         {/* Grid Background */}
         <div className="absolute inset-0 opacity-[0.03]" 
@@ -23,7 +34,7 @@ export const ProcessAnimation: React.FC = () => {
            }}>
         </div>
 
-        <div className="relative z-10 w-full max-w-5xl flex flex-col md:flex-row items-center justify-between gap-8 md:gap-10 px-4 md:px-12">
+        <div className="relative z-10 w-full max-w-5xl flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 px-4 md:px-12">
             
             {/* Step 1: The Document (RO) */}
             <div className="relative flex flex-col items-center gap-4 shrink-0">
@@ -31,7 +42,7 @@ export const ProcessAnimation: React.FC = () => {
                     className="w-20 h-28 bg-white rounded border border-slate-200 shadow-lg relative overflow-hidden flex flex-col p-2 gap-1.5"
                     initial={{ scale: 0.9, opacity: 0.5 }}
                     animate={{ 
-                        scale: step === 0 ? 1.5 : 1,
+                        scale: step === 0 ? activeScale : 1,
                         opacity: step === 0 ? 1 : 0.6,
                         boxShadow: step === 0 ? "0 25px 30px -5px rgb(0 0 0 / 0.15)" : "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                         zIndex: step === 0 ? 20 : 0
@@ -63,7 +74,7 @@ export const ProcessAnimation: React.FC = () => {
                 </motion.div>
                 <motion.div 
                     className={`text-sm md:text-lg font-bold transition-colors duration-500 ${step === 0 ? 'text-blue-600' : 'text-slate-400'}`}
-                    animate={{ y: step === 0 ? 35 : 0 }}
+                    animate={{ y: step === 0 ? labelLift : 0 }}
                     transition={{ duration: 0.4 }}
                 >
                     Ingest RO
@@ -77,7 +88,7 @@ export const ProcessAnimation: React.FC = () => {
                  <motion.div 
                     className="w-24 h-24 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center relative overflow-hidden"
                     animate={{ 
-                        scale: step === 1 ? 1.5 : 1,
+                        scale: step === 1 ? activeScale : 1,
                         borderColor: step === 1 ? '#3b82f6' : '#e2e8f0',
                         backgroundColor: step === 1 ? '#ffffff' : '#f8fafc',
                         boxShadow: step === 1 ? "0 20px 25px -5px rgba(59, 130, 246, 0.15)" : "none",
@@ -118,7 +129,7 @@ export const ProcessAnimation: React.FC = () => {
                  </motion.div>
                  <motion.div 
                     className={`text-sm md:text-lg font-bold transition-colors duration-500 ${step === 1 ? 'text-blue-600' : 'text-slate-400'}`}
-                    animate={{ y: step === 1 ? 35 : 0 }}
+                    animate={{ y: step === 1 ? labelLift : 0 }}
                     transition={{ duration: 0.4 }}
                  >
                     AI Match
@@ -132,7 +143,7 @@ export const ProcessAnimation: React.FC = () => {
                  <motion.div 
                     className="w-40 h-28 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center relative overflow-hidden"
                     animate={{ 
-                        scale: step === 2 ? 1.5 : 1,
+                        scale: step === 2 ? activeScale : 1,
                         borderColor: step === 2 ? '#3b82f6' : '#e2e8f0',
                         backgroundColor: step === 2 ? '#ffffff' : '#f8fafc',
                         boxShadow: step === 2 ? "0 20px 25px -5px rgba(59, 130, 246, 0.15)" : "none",
@@ -189,7 +200,7 @@ export const ProcessAnimation: React.FC = () => {
                  </motion.div>
                  <motion.div 
                     className={`text-sm md:text-lg font-bold transition-colors duration-500 ${step === 2 ? 'text-blue-600' : 'text-slate-400'}`}
-                    animate={{ y: step === 2 ? 35 : 0 }}
+                    animate={{ y: step === 2 ? labelLift : 0 }}
                     transition={{ duration: 0.4 }}
                  >
                     Compare
@@ -205,7 +216,7 @@ export const ProcessAnimation: React.FC = () => {
                     animate={{ 
                         borderColor: step === 3 ? '#10b981' : '#e2e8f0',
                         backgroundColor: step === 3 ? '#ffffff' : '#f8fafc',
-                        scale: step === 3 ? 1.5 : 1,
+                    scale: step === 3 ? activeScale : 1,
                         boxShadow: step === 3 ? "0 25px 30px -5px rgb(16 185 129 / 0.2)" : "none",
                         zIndex: step === 3 ? 20 : 0
                     }}
@@ -261,7 +272,7 @@ export const ProcessAnimation: React.FC = () => {
                  </motion.div>
                  <motion.div 
                     className={`text-sm md:text-lg font-bold transition-colors duration-500 ${step === 3 ? 'text-emerald-600' : 'text-slate-400'}`}
-                    animate={{ y: step === 3 ? 35 : 0 }}
+                animate={{ y: step === 3 ? labelLift : 0 }}
                     transition={{ duration: 0.4 }}
                  >
                     Better Margin

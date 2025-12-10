@@ -32,6 +32,14 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 # GEMINI_API_KEY=...
 ```
 
+Stripe env (set in Supabase dashboard/CLI for Edge Functions):
+- `STRIPE_SECRET_KEY` – your Stripe secret key
+- `STRIPE_PRICE_ID` – subscription price ID
+- `STRIPE_CHECKOUT_SUCCESS_URL` / `STRIPE_CHECKOUT_CANCEL_URL` – hosted success/cancel URLs
+- `STRIPE_PORTAL_RETURN_URL` – where the billing portal should send users after managing billing
+- `STRIPE_WEBHOOK_SECRET` – signing secret from the Stripe webhook endpoint
+- `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_URL` – already used by other functions
+
 3) Run dev server  
 ```bash
 npm run dev

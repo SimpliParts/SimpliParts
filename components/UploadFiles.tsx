@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UploadCloud, FileText, AlertCircle } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Button } from './ui/Button';
+import { guardUsage, startCheckout } from '../lib/billing';
 
 interface UploadFilesProps {
   setCurrentView: (view: import('../App').ViewState) => void;
@@ -9,6 +10,48 @@ interface UploadFilesProps {
 }
 
 export const UploadFiles: React.FC<UploadFilesProps> = ({ setCurrentView, currentView }) => {
+  const [usageMessage, setUsageMessage] = useState<string | null>(null);
+  const [usageError, setUsageError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const checkAccess = async () => {
+    try {
+      setLoading(true);
+      setUsageError(null);
+      const { data, error, status } = await guardUsage();
+      if (error) {
+        setUsageError(error.message || 'Unable to check access');
+        return;
+      }
+      if (status === 402 || data?.allowed === false) {
+        setUsageError('No free credits left. Please upgrade to continue.');
+        return;
+      }
+      if (data?.allowed) {
+        const remaining = data.remaining_credits ?? 'unlimited';
+        setUsageMessage(
+          data.reason === 'active_subscription'
+            ? 'Subscription active — upload enabled.'
+            : `Free credit used. ${remaining} credits remaining.`
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpgrade = async () => {
+    try {
+      setLoading(true);
+      const { url } = await startCheckout();
+      if (url) window.location.href = url;
+    } catch (err: any) {
+      setUsageError(err.message || 'Could not start checkout');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-[calc(100vh-72px)] pt-[72px]">
       <Sidebar
@@ -47,8 +90,19 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({ setCurrentView, curren
                       <span className="text-xs text-slate-400">PDF up to 20MB each</span>
                     </div>
                   </label>
-                  <Button className="md:w-40">Start Upload</Button>
+                  <Button className="md:w-40" onClick={checkAccess} disabled={loading}>
+                    {loading ? 'Checking...' : 'Start Upload'}
+                  </Button>
+                  <Button variant="outline" className="md:w-36" onClick={handleUpgrade} disabled={loading}>
+                    Upgrade
+                  </Button>
                 </div>
+                {usageMessage && (
+                  <p className="text-sm text-emerald-600">{usageMessage}</p>
+                )}
+                {usageError && (
+                  <p className="text-sm text-red-600">{usageError}</p>
+                )}
               </div>
             </div>
           </div>

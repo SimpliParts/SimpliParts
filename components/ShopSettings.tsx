@@ -4,6 +4,7 @@ import { Settings, Key, Building, Save, Trash2, Plus, Eye, EyeOff, AlertCircle, 
 import { supabase } from '../lib/supabase';
 import { Button } from './ui/Button';
 import { Sidebar } from './Sidebar';
+import { openBillingPortal, startCheckout } from '../lib/billing';
 
 interface ShopSettingsProps {
   session: Session | null;
@@ -33,6 +34,8 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
   const [showApiKeys, setShowApiKeys] = useState<{[key: string]: boolean}>({});
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
 
   // Form states for integrations
   const [partsTechForm, setPartsTechForm] = useState({
@@ -253,6 +256,32 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
     }
   };
 
+  const handleUpgrade = async () => {
+    try {
+      setBillingLoading(true);
+      setBillingError(null);
+      const { url } = await startCheckout();
+      if (url) window.location.href = url;
+    } catch (error: any) {
+      setBillingError(error.message || 'Could not start checkout');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    try {
+      setBillingLoading(true);
+      setBillingError(null);
+      const { url } = await openBillingPortal();
+      if (url) window.location.href = url;
+    } catch (error: any) {
+      setBillingError(error.message || 'Could not open billing portal');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
   const toggleApiKeyVisibility = (provider: string) => {
     setShowApiKeys(prev => ({
       ...prev,
@@ -323,12 +352,24 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
                     Subscription Status
                   </label>
                   <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-slate-600">
-                    {shop?.subscription_status === 'trialing' ? 'Free Trial' :
-                     shop?.subscription_status === 'active' ? 'Active' :
-                     shop?.subscription_status === 'past_due' ? 'Past Due' : 'Inactive'}
+                    {shop?.subscription_status === 'active' ? 'Active' :
+                     shop?.subscription_status === 'past_due' ? 'Past Due' :
+                     'Free Tier'}
                   </div>
+                  {shop && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      Free credits remaining: {shop.free_credits_remaining ?? 0}
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {billingError && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {billingError}
+                </p>
+              )}
 
               {errors.shop_general && (
                 <p className="text-sm text-red-600 flex items-center gap-1">
@@ -337,7 +378,25 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
                 </p>
               )}
 
-              <div className="flex justify-end">
+              <div className="flex flex-wrap gap-3 justify-end">
+                {shop?.subscription_status === 'active' ? (
+                  <Button
+                    variant="outline"
+                    onClick={handleManageBilling}
+                    disabled={billingLoading}
+                    className="flex items-center gap-2"
+                  >
+                    Manage Billing
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleUpgrade}
+                    disabled={billingLoading}
+                    className="flex items-center gap-2"
+                  >
+                    Upgrade
+                  </Button>
+                )}
                 <Button
                   onClick={saveShopInfo}
                   disabled={saving}
