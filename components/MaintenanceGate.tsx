@@ -34,7 +34,17 @@ export const MaintenanceGate: React.FC<MaintenanceGateProps> = ({
         .from('waitlist_interest')
         .insert({ email });
 
-      if (error) throw error;
+      if (error) {
+        // Supabase uses Postgres codes; 23505 is unique_violation
+        if ((error as any)?.code === '23505') {
+          setEmailStatus('success');
+          setEmailMessage('You are already on the list. Thanks for your interest!');
+          setEmail('');
+          return;
+        }
+        throw error;
+      }
+
       setEmailStatus('success');
       setEmailMessage('Thanks! We will notify you when we open access.');
       setEmail('');
