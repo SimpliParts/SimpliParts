@@ -20,6 +20,7 @@ import { AskAI } from './components/AskAI';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { MaintenanceGate } from './components/MaintenanceGate';
+import { Analytics } from '@vercel/analytics/react';
 
 export type ViewState =
   | 'landing'
@@ -163,9 +164,11 @@ const App: React.FC = () => {
           {currentView === 'ro-detail' && <RODetail setCurrentView={setCurrentView} currentView={currentView} />}
           {currentView === 'ask-ai' && <AskAI setCurrentView={setCurrentView} currentView={currentView} />}
         </main>
-        
+
         {currentView === 'landing' && <Footer />}
       </div>
+
+      <Analytics />
     </div>
   );
 };
