@@ -11,11 +11,13 @@ interface FeedbackProps {
   currentView: import('../App').ViewState;
   session: Session | null;
   shop: ShopInfo | null;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
 type FeedbackType = 'bug' | 'feature' | 'analytics' | 'question' | 'other';
 
-export const Feedback: React.FC<FeedbackProps> = ({ setCurrentView, currentView, session, shop }) => {
+export const Feedback: React.FC<FeedbackProps> = ({ setCurrentView, currentView, session, shop, mobileMenuOpen, setMobileMenuOpen }) => {
   const [formData, setFormData] = useState({
     type: 'bug' as FeedbackType,
     title: '',
@@ -87,6 +89,8 @@ export const Feedback: React.FC<FeedbackProps> = ({ setCurrentView, currentView,
         setCurrentView={setCurrentView}
         headingName="Feedback"
         headingSub="Share your thoughts"
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       <div className="flex-1 lg:ml-64 bg-slate-50 min-h-full">

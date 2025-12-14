@@ -7,6 +7,8 @@ import { supabase } from '../lib/supabase';
 interface SupportProps {
   setCurrentView: (view: import('../App').ViewState) => void;
   currentView: import('../App').ViewState;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
 interface SiteStatus {
@@ -17,7 +19,7 @@ interface SiteStatus {
   updated_at: string;
 }
 
-export const Support: React.FC<SupportProps> = ({ setCurrentView, currentView }) => {
+export const Support: React.FC<SupportProps> = ({ setCurrentView, currentView, mobileMenuOpen, setMobileMenuOpen }) => {
   const [statusData, setStatusData] = useState<SiteStatus[]>([]);
   const [statusLoading, setStatusLoading] = useState(true);
 
@@ -121,6 +123,8 @@ export const Support: React.FC<SupportProps> = ({ setCurrentView, currentView })
         setCurrentView={setCurrentView}
         headingName="Support Center"
         headingSub="Help & FAQs"
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       <div className="flex-1 lg:ml-64 bg-slate-50 min-h-full">

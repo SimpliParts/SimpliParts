@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState } from '../App';
-import { LayoutDashboard, Settings, HelpCircle, UploadCloud, Search, MessageSquare, MessageCircle, X } from 'lucide-react';
+import { LayoutDashboard, Settings, HelpCircle, UploadCloud, Search, MessageSquare, MessageCircle, X, Menu } from 'lucide-react';
 
 interface SidebarProps {
   currentView: ViewState;
   setCurrentView: (view: ViewState) => void;
   headingName?: string;
   headingSub?: string;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -14,13 +16,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setCurrentView,
   headingName = 'My Shop',
   headingSub = 'Enterprise Plan',
+  mobileMenuOpen,
+  setMobileMenuOpen,
 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
-  }, [currentView]);
+  }, [currentView, setMobileMenuOpen]);
 
   // Close mobile menu when clicking outside or on escape
   useEffect(() => {
@@ -50,15 +52,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       document.removeEventListener('click', handleClickOutside);
       document.body.style.overflow = '';
     };
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, setMobileMenuOpen]);
 
   const handleNavigation = (view: ViewState) => {
     setCurrentView(view);
     setMobileMenuOpen(false);
-  };
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
   };
   const platformItems: Array<{
     label: string;
@@ -168,18 +166,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
-      <button
-        onClick={toggleMobileMenu}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white border border-slate-200 shadow-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        aria-label="Open navigation menu"
-        aria-expanded={mobileMenuOpen}
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-
       {/* Desktop Sidebar */}
       <aside
         className="w-64 bg-white border-r border-slate-200 hidden lg:flex flex-col fixed top-[72px] bottom-0 z-20"
@@ -189,7 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <SidebarContent />
       </aside>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay - controlled by header hamburger on mobile */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-40" aria-hidden="true">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" />

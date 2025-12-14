@@ -7,6 +7,8 @@ import { Search, Clock3, Activity, CheckCircle2, AlertTriangle, ArrowRight } fro
 interface ROAuditProps {
   setCurrentView: (view: ViewState) => void;
   currentView: ViewState;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
 /**
@@ -15,7 +17,7 @@ interface ROAuditProps {
  * 2) Query PartsTech for replacements
  * 3) Review savings + push to Tekmetric
  */
-export const ROAudit: React.FC<ROAuditProps> = ({ setCurrentView, currentView }) => {
+export const ROAudit: React.FC<ROAuditProps> = ({ setCurrentView, currentView, mobileMenuOpen, setMobileMenuOpen }) => {
   return (
     <div className="flex min-h-[calc(100vh-72px)] pt-[72px]">
       <Sidebar
@@ -23,6 +25,8 @@ export const ROAudit: React.FC<ROAuditProps> = ({ setCurrentView, currentView })
         setCurrentView={setCurrentView}
         headingName="RO Audit"
         headingSub="Search • Audit • Replace"
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       <div className="flex-1 lg:ml-64 bg-slate-50 min-h-full">

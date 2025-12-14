@@ -11,9 +11,11 @@ interface DashboardProps {
   setCurrentView: (view: ViewState) => void;
   currentView: ViewState;
   shop?: ShopInfo | null;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ session, setCurrentView, currentView, shop }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ session, setCurrentView, currentView, shop, mobileMenuOpen, setMobileMenuOpen }) => {
   // Get user details (fallback if metadata is missing)
   const firstName = session?.user?.user_metadata?.first_name || 'Partner';
   const shopName = session?.user?.user_metadata?.shop_name || 'My Shop';
@@ -27,6 +29,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ session, setCurrentView, c
         setCurrentView={setCurrentView}
         headingName={shop?.name || shopName}
         headingSub={isActive ? 'Active' : 'Free Tier'}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       {/* Main Content */}

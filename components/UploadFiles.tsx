@@ -7,9 +7,11 @@ import { guardUsage, startCheckout } from '../lib/billing';
 interface UploadFilesProps {
   setCurrentView: (view: import('../App').ViewState) => void;
   currentView: import('../App').ViewState;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
-export const UploadFiles: React.FC<UploadFilesProps> = ({ setCurrentView, currentView }) => {
+export const UploadFiles: React.FC<UploadFilesProps> = ({ setCurrentView, currentView, mobileMenuOpen, setMobileMenuOpen }) => {
   const [usageMessage, setUsageMessage] = useState<string | null>(null);
   const [usageError, setUsageError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -59,6 +61,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({ setCurrentView, curren
         setCurrentView={setCurrentView}
         headingName="Uploads"
         headingSub="Import repair orders"
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       <div className="flex-1 lg:ml-64 bg-slate-50 min-h-full">

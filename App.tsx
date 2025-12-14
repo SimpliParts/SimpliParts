@@ -45,6 +45,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [maintenanceUnlocked, setMaintenanceUnlocked] = useState(false);
   const [shop, setShop] = useState<ShopInfo | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const maintenanceEnabled = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
   const previewPassword = import.meta.env.VITE_PREVIEW_PASSWORD || '';
@@ -154,7 +155,7 @@ const App: React.FC = () => {
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        <Header currentView={currentView} setCurrentView={setCurrentView} session={session} />
+        <Header currentView={currentView} setCurrentView={setCurrentView} session={session} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
         
         <main className="flex-grow">
           {currentView === 'landing' && (
@@ -174,14 +175,14 @@ const App: React.FC = () => {
           {currentView === 'signup' && <Signup setCurrentView={setCurrentView} />}
           {currentView === 'forgot-password' && <ForgotPassword setCurrentView={setCurrentView} />}
           {currentView === 'reset-password' && <ResetPassword setCurrentView={setCurrentView} />}
-          {currentView === 'dashboard' && <Dashboard session={session} setCurrentView={setCurrentView} currentView={currentView} shop={shop} />}
-          {currentView === 'shop-settings' && <ShopSettings session={session} setCurrentView={setCurrentView} currentView={currentView} />}
-          {currentView === 'support' && <Support setCurrentView={setCurrentView} currentView={currentView} />}
-          {currentView === 'feedback' && <Feedback setCurrentView={setCurrentView} currentView={currentView} session={session} shop={shop} />}
-          {currentView === 'upload-files' && <UploadFiles setCurrentView={setCurrentView} currentView={currentView} />}
-          {currentView === 'ro-audit' && <ROAudit setCurrentView={setCurrentView} currentView={currentView} />}
-          {currentView === 'ro-detail' && <RODetail setCurrentView={setCurrentView} currentView={currentView} />}
-          {currentView === 'ask-ai' && <AskAI setCurrentView={setCurrentView} currentView={currentView} />}
+          {currentView === 'dashboard' && <Dashboard session={session} setCurrentView={setCurrentView} currentView={currentView} shop={shop} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'shop-settings' && <ShopSettings session={session} setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'support' && <Support setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'feedback' && <Feedback setCurrentView={setCurrentView} currentView={currentView} session={session} shop={shop} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'upload-files' && <UploadFiles setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'ro-audit' && <ROAudit setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'ro-detail' && <RODetail setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'ask-ai' && <AskAI setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
         </main>
 
         {currentView === 'landing' && <Footer />}

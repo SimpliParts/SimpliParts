@@ -7,13 +7,15 @@ import { FileText, RefreshCw, ArrowUpRight, FileDown, CheckCircle2 } from 'lucid
 interface RODetailProps {
   setCurrentView: (view: ViewState) => void;
   currentView: ViewState;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
 /**
  * Placeholder for a single RO detail view.
  * Shows summary, audit history, and line-level outcomes.
  */
-export const RODetail: React.FC<RODetailProps> = ({ setCurrentView, currentView }) => {
+export const RODetail: React.FC<RODetailProps> = ({ setCurrentView, currentView, mobileMenuOpen, setMobileMenuOpen }) => {
   return (
     <div className="flex min-h-[calc(100vh-72px)] pt-[72px]">
       <Sidebar
@@ -21,6 +23,8 @@ export const RODetail: React.FC<RODetailProps> = ({ setCurrentView, currentView 
         setCurrentView={setCurrentView}
         headingName="RO Detail"
         headingSub="Single repair order"
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       <div className="flex-1 lg:ml-64 bg-slate-50 min-h-full">

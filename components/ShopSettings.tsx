@@ -10,6 +10,8 @@ interface ShopSettingsProps {
   session: Session | null;
   setCurrentView: (view: import('../App').ViewState) => void;
   currentView: import('../App').ViewState;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
 }
 
 interface Integration {
@@ -27,7 +29,7 @@ interface Shop {
   notification_emails?: string[];
 }
 
-export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentView, currentView }) => {
+export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentView, currentView, mobileMenuOpen, setMobileMenuOpen }) => {
   const [shop, setShop] = useState<Shop | null>(null);
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -409,6 +411,8 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
         setCurrentView={setCurrentView}
         headingName={shop?.name || 'My Shop'}
         headingSub="Settings"
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       {/* Main Content */}

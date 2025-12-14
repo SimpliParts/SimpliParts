@@ -10,11 +10,12 @@ interface HeaderProps {
   currentView: ViewState;
   setCurrentView: (view: ViewState) => void;
   session?: Session | null;
+  mobileMenuOpen?: boolean;
+  setMobileMenuOpen?: (open: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, session }) => {
+export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, session, mobileMenuOpen = false, setMobileMenuOpen }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,13 +26,13 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
   }, []);
 
   const handleMobileNav = () => {
-    setMobileMenuOpen(false);
+    setMobileMenuOpen?.(false);
   };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setCurrentView('landing');
-    setMobileMenuOpen(false);
+    setMobileMenuOpen?.(false);
   };
 
 
@@ -76,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
 
   const navigateTo = (view: ViewState) => {
     setCurrentView(view);
-    setMobileMenuOpen(false);
+    setMobileMenuOpen?.(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -143,8 +144,9 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
             )}
           </div>
 
+          {/* Show hamburger on mobile - for sidebar control on dashboard, header menu on other views */}
           <div className="md:hidden">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-slate-600">
+            <button onClick={() => setMobileMenuOpen?.(!mobileMenuOpen)} className="text-slate-600">
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
