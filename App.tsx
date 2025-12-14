@@ -18,6 +18,11 @@ import { ROAudit } from './components/ROAudit';
 import { RODetail } from './components/RODetail';
 import { AskAI } from './components/AskAI';
 import { Feedback } from './components/Feedback';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
+import { Security } from './components/Security';
+import { About } from './components/About';
+import { Contact } from './components/Contact';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { MaintenanceGate } from './components/MaintenanceGate';
@@ -37,7 +42,12 @@ export type ViewState =
   | 'upload-files'
   | 'ro-audit'
   | 'ro-detail'
-  | 'ask-ai';
+  | 'ask-ai'
+  | 'privacy-policy'
+  | 'terms-of-service'
+  | 'security'
+  | 'about'
+  | 'contact';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('landing');
@@ -183,9 +193,14 @@ const App: React.FC = () => {
           {currentView === 'ro-audit' && <ROAudit setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
           {currentView === 'ro-detail' && <RODetail setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
           {currentView === 'ask-ai' && <AskAI setCurrentView={setCurrentView} currentView={currentView} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />}
+          {currentView === 'privacy-policy' && <PrivacyPolicy setCurrentView={setCurrentView} />}
+          {currentView === 'terms-of-service' && <TermsOfService setCurrentView={setCurrentView} />}
+          {currentView === 'security' && <Security setCurrentView={setCurrentView} />}
+          {currentView === 'about' && <About setCurrentView={setCurrentView} />}
+          {currentView === 'contact' && <Contact setCurrentView={setCurrentView} />}
         </main>
 
-        {currentView === 'landing' && <Footer />}
+        {currentView === 'landing' && <Footer setCurrentView={setCurrentView} />}
       </div>
 
       <Analytics />

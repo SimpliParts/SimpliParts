@@ -26,7 +26,7 @@ export const Trust: React.FC = () => {
           <div className="absolute top-6 left-8 text-9xl text-slate-200 font-serif opacity-50 leading-none h-16 pointer-events-none">"</div>
           
           <blockquote className="text-xl md:text-2xl font-medium text-slate-800 mb-8 relative z-10 leading-relaxed">
-            We thought we had our parts pricing under control. AutoPrice found us <span className="text-emerald-600 font-bold bg-emerald-50 px-1 rounded">$10,700 in lost margin</span> in the first month alone. It's a no-brainer for any shop doing volume.
+            We thought we had our parts pricing under control. SimpliParts found us <span className="text-emerald-600 font-bold bg-emerald-50 px-1 rounded">$10,700 in lost margin</span> in the first month alone. It's a no-brainer for any shop doing volume.
           </blockquote>
           
           <div className="flex items-center justify-center gap-4">

@@ -1,6 +1,6 @@
-# SimpliParts (AutoPrice.pro UI)
+# SimpliParts
 
-React + Vite + Tailwind/Shadcn UI for the AutoPrice.pro experience (Tekmetric ↔ PartsTech financial intelligence layer).
+React + Vite + Tailwind/Shadcn UI for the SimpliParts experience (Tekmetric ↔ PartsTech financial intelligence layer).
 
 ## Key Flows (UI)
 - Dashboard: performance KPIs, savings trend, vendor scorecard, RO pipeline, top savings candidates.

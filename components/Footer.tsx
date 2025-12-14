@@ -1,8 +1,13 @@
 import React from 'react';
 import { Twitter, Linkedin, Github } from 'lucide-react';
 import { Logo } from './ui/Logo';
+import { ViewState } from '../App';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  setCurrentView: (view: ViewState) => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ setCurrentView }) => {
   return (
     <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,28 +30,24 @@ export const Footer: React.FC = () => {
             <h4 className="font-semibold text-white mb-4">Product</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="#" className="hover:text-blue-400 transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Integrations</a></li>
               <li><a href="#" className="hover:text-blue-400 transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Changelog</a></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-white mb-4">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">About</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Contact</a></li>
+              <li><button onClick={() => setCurrentView('about')} className="hover:text-blue-400 transition-colors text-left">About</button></li>
+              <li><button onClick={() => setCurrentView('contact')} className="hover:text-blue-400 transition-colors text-left">Contact</button></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-white mb-4">Legal</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Security</a></li>
+              <li><button onClick={() => setCurrentView('privacy-policy')} className="hover:text-blue-400 transition-colors text-left">Privacy Policy</button></li>
+              <li><button onClick={() => setCurrentView('terms-of-service')} className="hover:text-blue-400 transition-colors text-left">Terms of Service</button></li>
+              <li><button onClick={() => setCurrentView('security')} className="hover:text-blue-400 transition-colors text-left">Security</button></li>
             </ul>
           </div>
         </div>

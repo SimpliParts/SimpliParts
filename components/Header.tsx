@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
   };
 
 
-  const isAppView = currentView !== 'landing';
+  const isAppView = !['landing', 'privacy-policy', 'terms-of-service', 'security', 'about', 'contact'].includes(currentView);
   const isDashboardView = ['dashboard', 'shop-settings', 'support', 'feedback', 'upload-files', 'ro-audit', 'ro-detail', 'ask-ai'].includes(currentView);
 
   const dashboardNavItems = [
@@ -95,9 +95,16 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
               - Landing/Dashboard: Show Logo, clickable to Home/Dashboard
               - Login/Signup: Hide Logo visually to keep layout but cleaner look
           */}
-          {currentView === 'landing' || currentView === 'dashboard' ? (
-            <button 
-              onClick={() => currentView === 'dashboard' ? null : window.scrollTo({ top: 0, behavior: 'smooth' })}
+          {['landing', 'privacy-policy', 'terms-of-service', 'security', 'about'].includes(currentView) || currentView === 'dashboard' ? (
+            <button
+              onClick={() => {
+                if (currentView === 'dashboard') return;
+                if (['privacy-policy', 'terms-of-service', 'security', 'about', 'contact'].includes(currentView)) {
+                  setCurrentView('landing');
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
               className={`block hover:opacity-80 transition-opacity cursor-pointer ${currentView === 'dashboard' ? 'cursor-default' : ''}`}
             >
               <Logo />
@@ -115,12 +122,21 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
               <a href="#roi" onClick={(e) => scrollToSection(e, 'roi')} className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">ROI Calculator</a>
               <a href="#pricing" onClick={(e) => scrollToSection(e, 'pricing')} className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Pricing</a>
             </nav>
+          ) : ['privacy-policy', 'terms-of-service', 'security', 'about', 'contact'].includes(currentView) ? (
+            <nav className="hidden md:flex items-center">
+              <button
+                onClick={() => setCurrentView('landing')}
+                className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+              >
+                ← Back to Home
+              </button>
+            </nav>
           ) : (
             <div className="hidden md:block flex-1"></div>
           )}
 
           <div className="hidden md:flex items-center gap-4">
-            {currentView === 'landing' && !session && (
+            {['landing', 'privacy-policy', 'terms-of-service', 'security', 'about', 'contact'].includes(currentView) && !session && (
               <>
                  <button onClick={() => navigateTo('login')} className="text-sm font-medium text-slate-600 hover:text-slate-900">Log in</button>
                  <Button size="sm" onClick={() => navigateTo('signup')}>Get Started</Button>
@@ -156,7 +172,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 p-4 shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-72px)] overflow-y-auto">
           <nav className="flex flex-col gap-4">
-            {currentView === 'landing' && (
+            {['landing', 'privacy-policy', 'terms-of-service', 'security'].includes(currentView) && (
               <>
                 <a href="#workflow" onClick={(e) => scrollToSection(e, 'workflow')} className="text-sm font-medium text-slate-600 block py-2">How it Works</a>
                 <a href="#roi" onClick={(e) => scrollToSection(e, 'roi')} className="text-sm font-medium text-slate-600 block py-2">ROI Calculator</a>
