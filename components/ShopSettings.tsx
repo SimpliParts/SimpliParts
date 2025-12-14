@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
-import { Settings, Key, Building, Save, Trash2, Plus, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Settings, Key, Building, Save, Trash2, Plus, Eye, EyeOff, AlertCircle, CheckCircle, Mail } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from './ui/Button';
 import { Sidebar } from './Sidebar';
@@ -24,6 +24,7 @@ interface Shop {
   id: string;
   name: string;
   subscription_status: string;
+  notification_emails?: string[];
 }
 
 export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentView, currentView }) => {
@@ -55,6 +56,12 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
     name: ''
   });
 
+  // Form state for notification emails
+  const [emailForm, setEmailForm] = useState({
+    newEmail: ''
+  });
+  const [notificationEmails, setNotificationEmails] = useState<string[]>([]);
+
   useEffect(() => {
     if (session?.user?.id) {
       fetchShopData();
@@ -63,23 +70,48 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
   }, [session]);
 
   const fetchShopData = async () => {
+    console.log('ShopSettings: fetchShopData called');
+    console.log('ShopSettings: session:', session);
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('shop_id')
         .eq('id', session?.user?.id)
         .single();
 
+      console.log('ShopSettings: profile result:', { profile, profileError });
+
       if (profile?.shop_id) {
-        const { data: shopData } = await supabase
+        const { data: shopData, error: shopError } = await supabase
           .from('shops')
           .select('*')
           .eq('id', profile.shop_id)
           .single();
 
+        console.log('ShopSettings: shop result:', { shopData, shopError });
+
         if (shopData) {
           setShop(shopData);
           setShopForm({ name: shopData.name });
+          setNotificationEmails(shopData.notification_emails || []);
+          console.log('ShopSettings: shop data set:', shopData);
+        }
+
+        // For existing shops without notification_emails, add the current user's email
+        if (shopData && (!shopData.notification_emails || shopData.notification_emails.length === 0) && session?.user?.email) {
+          console.log('ShopSettings: Adding current user email to notification list');
+          const updatedEmails = [session.user.email];
+          setNotificationEmails(updatedEmails);
+
+          // Auto-save this for existing shops
+          try {
+            await supabase
+              .from('shops')
+              .update({ notification_emails: updatedEmails })
+              .eq('id', shopData.id);
+          } catch (error) {
+            console.error('Error auto-adding user email:', error);
+          }
         }
       }
     } catch (error) {
@@ -256,6 +288,87 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
     }
   };
 
+  const addNotificationEmail = () => {
+    const email = emailForm.newEmail.trim().toLowerCase();
+
+    if (!email) {
+      setErrors({ email_empty: 'Email address is required' });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrors({ email_invalid: 'Please enter a valid email address' });
+      return;
+    }
+
+    if (notificationEmails.includes(email)) {
+      setErrors({ email_duplicate: 'This email is already in the list' });
+      return;
+    }
+
+    setNotificationEmails([...notificationEmails, email]);
+    setEmailForm({ newEmail: '' });
+    setErrors({});
+  };
+
+  const removeNotificationEmail = (emailToRemove: string) => {
+    setNotificationEmails(notificationEmails.filter(email => email !== emailToRemove));
+  };
+
+  const saveNotificationEmails = async () => {
+    console.log('saveNotificationEmails called');
+    console.log('shop:', shop);
+    console.log('shop?.id:', shop?.id);
+    console.log('notificationEmails:', notificationEmails);
+
+    if (!shop?.id) {
+      setErrors({ email_general: 'Shop information not available. Please refresh the page.' });
+      setSaving(false); // Make sure loading state is reset
+      return;
+    }
+
+    setSaving(true);
+    setErrors({});
+    setSuccessMessage('');
+
+    try {
+      console.log('Updating notification emails...');
+      const { data, error } = await supabase
+        .from('shops')
+        .update({ notification_emails: notificationEmails })
+        .eq('id', shop.id)
+        .select();
+
+      console.log('Update result:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Update successful, data:', data);
+      setSuccessMessage('Notification emails updated successfully!');
+
+      // Small delay before refreshing to ensure DB is updated
+      setTimeout(async () => {
+        try {
+          await fetchShopData();
+        } catch (fetchError) {
+          console.error('Error refreshing shop data:', fetchError);
+          // Don't show error for fetch, as the update was successful
+        }
+      }, 500);
+
+    } catch (error: any) {
+      console.error('Error updating notification emails:', error);
+      setErrors({ email_general: error.message || 'Failed to update notification emails' });
+    } finally {
+      console.log('Finally block reached, setting saving to false');
+      setSaving(false);
+    }
+  };
+
   const handleUpgrade = async () => {
     try {
       setBillingLoading(true);
@@ -404,6 +517,96 @@ export const ShopSettings: React.FC<ShopSettingsProps> = ({ session, setCurrentV
                 >
                   <Save size={16} />
                   {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Notification Emails */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                <Mail size={20} className="text-slate-600" />
+                Notification Emails
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">Manage email addresses for notifications and reminders</p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Add Email Form */}
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <input
+                    type="email"
+                    value={emailForm.newEmail}
+                    onChange={(e) => setEmailForm({ newEmail: e.target.value })}
+                    placeholder="Enter email address"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyPress={(e) => e.key === 'Enter' && addNotificationEmail()}
+                  />
+                </div>
+                <Button
+                  onClick={addNotificationEmail}
+                  disabled={!emailForm.newEmail.trim()}
+                  className="flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  Add
+                </Button>
+              </div>
+
+              {/* Email Errors */}
+              {errors.email_empty && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.email_empty}
+                </p>
+              )}
+              {errors.email_invalid && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.email_invalid}
+                </p>
+              )}
+              {errors.email_duplicate && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.email_duplicate}
+                </p>
+              )}
+
+              {/* Current Emails List */}
+              {notificationEmails.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-slate-700">Current notification emails:</h4>
+                  <div className="space-y-2">
+                    {notificationEmails.map((email, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-md">
+                        <span className="text-sm text-slate-700">{email}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeNotificationEmail(email)}
+                          className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          <Trash2 size={14} />
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Save Button */}
+              <div className="flex justify-end">
+                <Button
+                  onClick={saveNotificationEmails}
+                  disabled={saving}
+                  className="flex items-center gap-2"
+                >
+                  <Save size={16} />
+                  {saving ? 'Saving...' : 'Save Email List'}
                 </Button>
               </div>
             </div>

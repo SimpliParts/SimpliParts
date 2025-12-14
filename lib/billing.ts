@@ -7,6 +7,7 @@ export interface ShopInfo {
   free_credits_remaining: number | null;
   subscription_current_period_end?: string | null;
   stripe_customer_id?: string | null;
+  notification_emails?: string[];
 }
 
 export async function fetchShopInfo(userId?: string) {
@@ -22,7 +23,7 @@ export async function fetchShopInfo(userId?: string) {
 
   const { data: shop } = await supabase
     .from("shops")
-    .select("id, name, subscription_status, free_credits_remaining, subscription_current_period_end, stripe_customer_id")
+    .select("id, name, subscription_status, free_credits_remaining, subscription_current_period_end, stripe_customer_id, notification_emails")
     .eq("id", profile.shop_id)
     .single();
 

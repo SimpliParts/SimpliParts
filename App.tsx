@@ -17,10 +17,12 @@ import { UploadFiles } from './components/UploadFiles';
 import { ROAudit } from './components/ROAudit';
 import { RODetail } from './components/RODetail';
 import { AskAI } from './components/AskAI';
+import { Feedback } from './components/Feedback';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { MaintenanceGate } from './components/MaintenanceGate';
 import { Analytics } from '@vercel/analytics/react';
+import { fetchShopInfo, ShopInfo } from './lib/billing';
 
 export type ViewState =
   | 'landing'
@@ -31,6 +33,7 @@ export type ViewState =
   | 'dashboard'
   | 'shop-settings'
   | 'support'
+  | 'feedback'
   | 'upload-files'
   | 'ro-audit'
   | 'ro-detail'
@@ -41,6 +44,7 @@ const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [maintenanceUnlocked, setMaintenanceUnlocked] = useState(false);
+  const [shop, setShop] = useState<ShopInfo | null>(null);
 
   const maintenanceEnabled = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
   const previewPassword = import.meta.env.VITE_PREVIEW_PASSWORD || '';
@@ -70,8 +74,22 @@ const App: React.FC = () => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+
+      // Fetch shop info when user signs in
+      if (session?.user?.id) {
+        try {
+          const shopInfo = await fetchShopInfo(session.user.id);
+          setShop(shopInfo);
+        } catch (err) {
+          console.error('Failed to load shop info', err);
+          setShop(null);
+        }
+      } else {
+        setShop(null);
+      }
+
       setCurrentView((prev) => {
         if (session) {
           // Only redirect to dashboard from public/auth views
@@ -81,7 +99,7 @@ const App: React.FC = () => {
         }
 
         // On sign-out, return to landing from protected views
-        if (prev === 'dashboard' || prev === 'shop-settings' || prev === 'support' || prev === 'upload-files' || prev === 'ro-audit' || prev === 'ro-detail' || prev === 'ask-ai') {
+        if (prev === 'dashboard' || prev === 'shop-settings' || prev === 'support' || prev === 'feedback' || prev === 'upload-files' || prev === 'ro-audit' || prev === 'ro-detail' || prev === 'ask-ai') {
           return 'landing';
         }
 
@@ -156,9 +174,10 @@ const App: React.FC = () => {
           {currentView === 'signup' && <Signup setCurrentView={setCurrentView} />}
           {currentView === 'forgot-password' && <ForgotPassword setCurrentView={setCurrentView} />}
           {currentView === 'reset-password' && <ResetPassword setCurrentView={setCurrentView} />}
-          {currentView === 'dashboard' && <Dashboard session={session} setCurrentView={setCurrentView} currentView={currentView} />}
+          {currentView === 'dashboard' && <Dashboard session={session} setCurrentView={setCurrentView} currentView={currentView} shop={shop} />}
           {currentView === 'shop-settings' && <ShopSettings session={session} setCurrentView={setCurrentView} currentView={currentView} />}
           {currentView === 'support' && <Support setCurrentView={setCurrentView} currentView={currentView} />}
+          {currentView === 'feedback' && <Feedback setCurrentView={setCurrentView} currentView={currentView} session={session} shop={shop} />}
           {currentView === 'upload-files' && <UploadFiles setCurrentView={setCurrentView} currentView={currentView} />}
           {currentView === 'ro-audit' && <ROAudit setCurrentView={setCurrentView} currentView={currentView} />}
           {currentView === 'ro-detail' && <RODetail setCurrentView={setCurrentView} currentView={currentView} />}

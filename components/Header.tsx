@@ -34,6 +34,19 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
     setMobileMenuOpen(false);
   };
 
+
+  const isAppView = currentView !== 'landing';
+  const isDashboardView = ['dashboard', 'shop-settings', 'support', 'feedback', 'upload-files', 'ro-audit', 'ro-detail', 'ask-ai'].includes(currentView);
+
+  const dashboardNavItems = [
+    { label: 'Dashboard', view: 'dashboard' as const },
+    { label: 'Upload Files', view: 'upload-files' as const },
+    { label: 'Audit RO', view: 'ro-audit' as const },
+    { label: 'Ask AI', view: 'ask-ai' as const },
+    { label: 'Shop Settings', view: 'shop-settings' as const },
+    { label: 'Support', view: 'support' as const },
+  ];
+
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     handleMobileNav();
@@ -66,8 +79,6 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const isAppView = currentView !== 'landing';
 
   return (
     <header
@@ -114,7 +125,8 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
                  <Button size="sm" onClick={() => navigateTo('signup')}>Get Started</Button>
               </>
             )}
-            
+
+
             {/* Dashboard & Settings Views - Show Sign Out */}
             {(currentView === 'dashboard' || currentView === 'shop-settings' || currentView === 'support' || currentView === 'upload-files' || currentView === 'ro-audit' || currentView === 'ro-detail' || currentView === 'ask-ai') && (
               <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
@@ -140,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 p-4 shadow-xl animate-in slide-in-from-top-2 duration-200">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 p-4 shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-72px)] overflow-y-auto">
           <nav className="flex flex-col gap-4">
             {currentView === 'landing' && (
               <>
@@ -150,13 +162,34 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setCurrentView, ses
                 <hr className="border-slate-100" />
               </>
             )}
-            
+
+            {session && isDashboardView && (
+              <>
+                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-2">Navigation</div>
+                {dashboardNavItems.map((item) => (
+                  <button
+                    key={item.view}
+                    onClick={() => navigateTo(item.view)}
+                    className={`text-sm font-medium py-2 text-left transition-colors ${
+                      currentView === item.view
+                        ? 'text-blue-600 font-semibold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                <hr className="border-slate-100" />
+              </>
+            )}
+
             {!session && (
                 <>
                     <button onClick={() => navigateTo('login')} className="text-sm font-medium text-slate-600 py-2 text-left">Log in</button>
                     <Button className="w-full" onClick={() => navigateTo('signup')}>Get Started</Button>
                 </>
             )}
+
 
             {session && (
                 <Button variant="outline" className="w-full justify-center" onClick={handleSignOut}>Sign Out</Button>

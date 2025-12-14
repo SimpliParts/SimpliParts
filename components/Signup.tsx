@@ -58,6 +58,26 @@ export const Signup: React.FC<SignupProps> = ({ setCurrentView }) => {
         setError(error.message);
         setLoading(false);
     } else {
+        // Send welcome email
+        try {
+            const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+                body: {
+                    email: formData.email,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    shopName: formData.shopName,
+                }
+            });
+
+            if (emailError) {
+                console.error('Failed to send welcome email:', emailError);
+                // Don't show error to user as signup was successful
+            }
+        } catch (emailError) {
+            console.error('Error sending welcome email:', emailError);
+            // Don't show error to user as signup was successful
+        }
+
         // Successful signup usually triggers auto-login, which updates App.tsx state
         // If email confirmation is enabled, we might need to show a success message instead
         setLoading(false);
